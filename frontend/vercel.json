@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "http://45.126.127.249:5000/api/:path*" },
+    { "source": "/hubs/:path*", "destination": "http://45.126.127.249:5000/hubs/:path*" },
+    { "source": "/uploads/:path*", "destination": "http://45.126.127.249:5000/uploads/:path*" }
+  ]
+}

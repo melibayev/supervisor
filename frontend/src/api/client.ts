@@ -1,6 +1,6 @@
 import type { LoginRequest, LoginResponse } from '@/types';
 
-const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const BASE_URL = '/api';
 
 class ApiClient {
   private accessToken: string | null = null;
