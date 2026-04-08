@@ -9,6 +9,7 @@ backend/obj/
 
 # Environment
 .env
+.env.*
 *.env.local
 
 # IDE

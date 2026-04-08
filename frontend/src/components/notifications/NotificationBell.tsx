@@ -54,7 +54,7 @@ export default function NotificationBell() {
       if (!token) return;
 
       connection = new HubConnectionBuilder()
-        .withUrl('/api/../hubs/notifications', {
+        .withUrl(`${import.meta.env.VITE_API_URL || '/api'}/../hubs/notifications`, {
           accessTokenFactory: () => localStorage.getItem('accessToken') ?? ''
         })
         .withAutomaticReconnect()

@@ -1,0 +1,54 @@
+# Production deployment - Kamatera server
+# Backend + PostgreSQL + Redis only (frontend on Vercel)
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=lg_supervisor;Username=postgres;Password=${POSTGRES_PASSWORD}
+      - Jwt__Key=${JWT_SECRET}
+      - Jwt__Issuer=LGSupervisor
+      - Jwt__Audience=LGSupervisorApp
+      - Jwt__AccessTokenExpiryMinutes=60
+      - Jwt__RefreshTokenExpiryDays=7
+      - Frontend__Url=${FRONTEND_URL}
+    volumes:
+      - uploads:/app/uploads
+
+  postgres:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: lg_supervisor
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    volumes:
+      - redisdata:/data
+
+volumes:
+  pgdata:
+  uploads:
+  redisdata:

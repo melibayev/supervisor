@@ -43,7 +43,7 @@ export default function LiveActivityFeedSection({ widgetId, isPinned, onPinToggl
     if (!token) return;
 
     const connection = new HubConnectionBuilder()
-      .withUrl('/hubs/notifications', { accessTokenFactory: () => token })
+      .withUrl(`${import.meta.env.VITE_API_URL || '/api'}/../hubs/notifications`, { accessTokenFactory: () => token })
       .withAutomaticReconnect()
       .build();
 

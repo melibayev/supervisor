@@ -62,13 +62,13 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddSignalR();
 
 // CORS
+var frontendUrl = builder.Configuration["Frontend:Url"] ?? "http://localhost:3000";
+var corsOrigins = new List<string> { frontendUrl, "http://localhost:5173", "http://localhost:3000", "http://localhost:3002" };
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(
-                builder.Configuration["Frontend:Url"] ?? "http://localhost:3000",
-                "http://localhost:5173")
+        policy.WithOrigins(corsOrigins.ToArray())
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
