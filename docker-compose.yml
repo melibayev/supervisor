@@ -1,0 +1,56 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3000"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:5000/api
+      - VITE_SIGNALR_URL=http://localhost:5000/hubs
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=lg_supervisor;Username=postgres;Password=postgres123
+      - Jwt__Key=LG-Supervisor-Super-Secret-Key-2025-Must-Be-At-Least-32-Characters-Long
+      - Jwt__Issuer=LGSupervisor
+      - Jwt__Audience=LGSupervisorApp
+      - Jwt__AccessTokenExpiryMinutes=60
+      - Jwt__RefreshTokenExpiryDays=7
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: lg_supervisor
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redisdata:/data
+
+volumes:
+  pgdata:
+  redisdata:
